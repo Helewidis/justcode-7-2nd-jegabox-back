@@ -67,8 +67,8 @@ const signIn = async (req, res) => {
     let message = `USER '${account_id}' SIGNED IN`;
     const id = userInDB.id;
     account_id = userInDB.account_id;
-    const phone_number = userInDB.phone_number;
-    const token = jwt.sign(
+    phone_number = userInDB.phone_number;
+    token = jwt.sign(
       {
         type: 'JWT',
         id: id,
@@ -223,7 +223,7 @@ const requestValidateNumber = async (req, res) => {
           type: 'SMS',
           countryCode: '82',
           from: '01046857815',
-          content: `[제가박스] 인증번호${randomNumber} 를 입력해주세요. 인증번호는 3분간 유효합니다.`,
+          content: `[jetabox] 인증번호는 ${randomNumber}입니다. 인증번호는 3분간 유효합니다.`,
           messages: [{ to: `${phone_number}` }],
         }),
       }
@@ -231,17 +231,17 @@ const requestValidateNumber = async (req, res) => {
       .then(res => res.json())
       .then(json => {
         console.log('NAVER SENS API RESULT', json);
-        console.log('VALIDATE NUMBER', randomNumber);
+        console.log('VALIDATION NUMBER', randomNumber);
       });
     // ---------------네이버SENS API 호출 로직 끝---------------------------- //
 
-    message = `TOKEN ISSUED. AVALIABLE TO REDIRECT PAGE TO MODIFY '${account_id}''S PASSWORD`;
+    message = `VALIDATION NUMBER TO RESET PASSWORD IS ISSUED FOR USER '${account_id}'`;
     console.log(message);
     res.status(200).json({
       code: 200,
       userID: account_id,
       phone_number: phone_number,
-      validate_number: randomNumber,
+      validation_number: randomNumber,
     });
   } catch (err) {
     console.log(err);
@@ -256,15 +256,13 @@ const checkValidateNumber = async (req, res) => {
     // 사용자가 입력한 인증번호를 추출
     if (!myCache.get('randomNumberObj')) {
       // 인증번호객체가 없을 경우 에러 발생(인증시간만료)
-      throw new Error('VALIDATE NUMBER EXPIRED');
+      throw new Error('VALIDATION NUMBER EXPIRED');
     }
-    if (myCache.get('randomNumberObj').randomNumber != validateNumber) {
+    if (myCache.get('randomNumberObj').randomNumber !== validateNumber) {
       // 사용자가 입력한 인증번호와 캐쉬 내 인증번호가 다를 경우 에러 발생
-      throw new Error('INVALID VALIDATE NUMBER');
+      throw new Error('INVALID VALIDATION NUMBER');
     }
     // 사용자가 입력한 인증번호와 캐쉬 내 인증번호가 일치할 경우 토큰 발행
-    console.log(myCache.get('randomNumberObj').randomNumber);
-    console.log(validateNumber);
     token = jwt.sign(
       {
         type: 'JWT',
@@ -280,7 +278,6 @@ const checkValidateNumber = async (req, res) => {
     console.log(message);
     res.status(200).json({
       code: 200,
-      message: message,
       userID: account_id,
       token: token,
     });
@@ -410,7 +407,7 @@ const sendValidateNumber = async (req, res) => {
           type: 'SMS',
           countryCode: '82',
           from: '01046857815',
-          content: `[제가박스] 인증번호는 ${randomNumber}입니다. 인증번호는 3분간 유효합니다.`,
+          content: `[jetabox] 인증번호는 ${randomNumber}입니다. 인증번호는 3분간 유효합니다.`,
           messages: [{ to: `${phone_number}` }],
         }),
       }
@@ -418,17 +415,17 @@ const sendValidateNumber = async (req, res) => {
       .then(res => res.json())
       .then(json => {
         console.log('NAVER SENS API RESULT', json);
-        console.log('VALIDATE NUMBER', randomNumber);
+        console.log('VALIDATION NUMBER', randomNumber);
       });
     // ---------------네이버SENS API 호출 로직 끝---------------------------- //
 
-    message = `VALIDATE NUMBER TO RESET PASSWORD IS ISSUED FOR USER '${account_id}'`;
+    message = `VALIDATION NUMBER TO RESET PASSWORD IS ISSUED FOR USER '${account_id}'`;
     console.log(message);
     res.status(200).json({
       code: 200,
       userID: account_id,
       phone_number: phone_number,
-      validate_number: randomNumber,
+      validation_number: randomNumber,
     });
   } catch (err) {
     console.log(err);

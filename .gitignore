@@ -241,6 +241,9 @@ $RECYCLE.BIN/
 *.lnk
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc4f5a8 (FEAT: VALIDATE NUMBER API, USER INFORMATION MODIFY DELETE API CEATED)
 ./db
 .env
 package.json
@@ -248,6 +251,7 @@ package-lock.json
 formemo.js
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,visualstudiocode,node
+<<<<<<< HEAD
 =======
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,visualstudiocode,node
 .env
@@ -255,3 +259,5 @@ package.json
 package-lock.json
 db/schema.sql
 >>>>>>> origin/dev
+=======
+>>>>>>> dc4f5a8 (FEAT: VALIDATE NUMBER API, USER INFORMATION MODIFY DELETE API CEATED)

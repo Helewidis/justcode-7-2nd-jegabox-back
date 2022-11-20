@@ -19,10 +19,17 @@ router.post('/ID', userController.findID);
 router.delete('/ID', userController.deleteAccount);
 
 //비밀번호 재설정 할 때 인증번호 요청API
+<<<<<<< HEAD
 router.post('/validateNumber1', userController.requestValidateNumber);
 
 //본인인증을 위한 인증번호 발송API(회원정보 수정 시)
 router.post('/validateNumber2', userController.sendValidateNumber);
+=======
+router.post('/validateNumber', userController.requestValidateNumber);
+
+//본인인증을 위한 인증번호 발송API(회원정보 수정 시)
+router.post('/validateNumber', userController.sendValidateNumber);
+>>>>>>> dc4f5a8 (FEAT: VALIDATE NUMBER API, USER INFORMATION MODIFY DELETE API CEATED)
 
 //인증번호 확인API
 router.patch('/validateNumber', userController.checkValidateNumber);
