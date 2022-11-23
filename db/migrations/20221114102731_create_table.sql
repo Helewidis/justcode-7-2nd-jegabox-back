@@ -25,7 +25,8 @@ CREATE TABLE `movie` (
     `genre` varchar(300) COMMENT '장르',
     `release_date` datetime,
     `movie_poster` varchar(200),
-    `like` int default 0
+    `like` int default 0,
+    `viewer` int default 0
 );
 
 CREATE TABLE `movie_type` (
