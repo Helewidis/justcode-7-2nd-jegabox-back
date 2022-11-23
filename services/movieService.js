@@ -264,3 +264,18 @@ module.exports = {
   searchText,
   searchTitle,
 };
+<<<<<<< HEAD
+=======
+
+async function getMovieByTitle(searchText) {
+  const result = await movieDao.getMovieByTitle(searchText);
+  return result;
+}
+
+module.exports = {
+  getMainMovies,
+  getAllMovies,
+  getComingsoonMovies,
+  getMovieByTitle,
+};
+>>>>>>> 9ea4666 (for Merge)
