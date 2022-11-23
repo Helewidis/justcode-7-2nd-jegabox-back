@@ -55,6 +55,9 @@ const getAllMovies = async (likecnt, release) => {
     mtt.type,
     avgt.rated,
     lct.likeCnt
+=======
+  SELECT movie.id, movie.ko_title, movie.movie_poster, movie.like, movie.description, movie.release_date, lt.cnt, mtt.type
+>>>>>>> origin/dev
   FROM movie
   ${likecnt}
   LEFT JOIN (SELECT movie_id, ROUND(avg(rating),1) AS rated FROM comment GROUP BY movie_id ) AS avgt ON movie.id = avgt.movie_id
