@@ -228,11 +228,7 @@ CREATE TABLE `showtime` (
   PRIMARY KEY (`id`),
   KEY `movie_cinema_id` (`movie_cinema_id`),
   CONSTRAINT `showtime_ibfk_1` FOREIGN KEY (`movie_cinema_id`) REFERENCES `movie_cinema` (`id`)
-<<<<<<< HEAD
 ) ENGINE=InnoDB AUTO_INCREMENT=286 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-=======
-) ENGINE=InnoDB AUTO_INCREMENT=337 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
->>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -248,11 +244,7 @@ CREATE TABLE `showtime_seat` (
   PRIMARY KEY (`id`),
   KEY `showtime_id` (`showtime_id`),
   CONSTRAINT `showtime_seat_ibfk_1` FOREIGN KEY (`showtime_id`) REFERENCES `showtime` (`id`)
-<<<<<<< HEAD
 ) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-=======
-) ENGINE=InnoDB AUTO_INCREMENT=6721 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
->>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

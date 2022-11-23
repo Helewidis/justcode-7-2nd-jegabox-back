@@ -67,13 +67,7 @@ const signIn = async (req, res) => {
     let message = `USER '${account_id}' SIGNED IN`;
     const id = userInDB.id;
     account_id = userInDB.account_id;
-<<<<<<< HEAD
     const phone_number = userInDB.phone_number;
-=======
-    console.log(userInDB);
-    let id = userInDB.id;
-    console.log(id);
->>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
     token = jwt.sign(
       {
         type: 'JWT',

@@ -5,7 +5,6 @@ const mypageController = require('../controllers/mypageController');
 
 const router = express.Router();
 
-<<<<<<< HEAD
 router.get(
   '/bookinglist',
   asyncWrap(mw.authMiddleware),
@@ -23,7 +22,4 @@ router.get(
   asyncWrap(mypageController.getHeaderInfo)
 );
 
-=======
-router.get('/bookinglist', getBookRecord);
->>>>>>> 95e663e (conflict 해결을 위한 파일 정리)
 module.exports = router;
