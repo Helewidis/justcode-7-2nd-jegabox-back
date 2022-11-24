@@ -11,14 +11,20 @@ const getMainMovies = async token => {
       }
     });
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8ad5be7 (FEAT: add likecnt query)
     mainMovies.forEach(item => {
       if (item.cnt === 'null') {
         item.cnt = 0;
       }
       item.cnt = item.cnt + item.like;
     });
+<<<<<<< HEAD
 =======
 >>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
+=======
+>>>>>>> 8ad5be7 (FEAT: add likecnt query)
     return mainMovies;
   } else {
     const user = jwt.verify(token, process.env.SECRET_KEY);
@@ -31,14 +37,20 @@ const getMainMovies = async token => {
       }
     });
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8ad5be7 (FEAT: add likecnt query)
     mainMovies.forEach(item => {
       if (item.cnt === 'null') {
         item.cnt = 0;
       }
       item.cnt = item.cnt + item.like;
     });
+<<<<<<< HEAD
 =======
 >>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
+=======
+>>>>>>> 8ad5be7 (FEAT: add likecnt query)
     return mainMovies;
   }
 };
