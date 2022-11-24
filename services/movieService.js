@@ -18,7 +18,9 @@ const getMainMovies = async token => {
     });
     return mainMovies;
   } else {
+    console.log(token);
     const user = jwt.verify(token, process.env.SECRET_KEY);
+    console.log(user);
     const user_id = user.id;
     const likecnt = `LEFT JOIN (SELECT movie_id, count(*) AS likeCnt FROM jegabox.like WHERE user_id = ${user_id} GROUP BY movie_id) AS lct ON movie.id = lct.movie_id`;
     const mainMovies = await movieDao.getMainMovies(likecnt);
