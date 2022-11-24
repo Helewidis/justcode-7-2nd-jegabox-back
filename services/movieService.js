@@ -10,12 +10,15 @@ const getMainMovies = async token => {
         unit.likeCnt = 0;
       }
     });
+<<<<<<< HEAD
     mainMovies.forEach(item => {
       if (item.cnt === 'null') {
         item.cnt = 0;
       }
       item.cnt = item.cnt + item.like;
     });
+=======
+>>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
     return mainMovies;
   } else {
     const user = jwt.verify(token, process.env.SECRET_KEY);
@@ -27,12 +30,15 @@ const getMainMovies = async token => {
         unit.likeCnt = 0;
       }
     });
+<<<<<<< HEAD
     mainMovies.forEach(item => {
       if (item.cnt === 'null') {
         item.cnt = 0;
       }
       item.cnt = item.cnt + item.like;
     });
+=======
+>>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
     return mainMovies;
   }
 };
