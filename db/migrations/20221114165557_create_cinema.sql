@@ -33,4 +33,3 @@ TRUNCATE TABLE location;
 TRUNCATE TABLE cinema;
 TRUNCATE TABLE movie_cinema;
 SET foreign_key_checks = 1;
-

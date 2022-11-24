@@ -25,8 +25,10 @@ async function findCinemaByLocation(loc_id) {
   return rtn;
 }
 
-async function findMovieTimeByCinema( date, movie_id, cinema_id) {
-  const rtn = await database.query(`
+async function findMovieTimeByCinema(date, movie_id, cinema_id) {
+  const rtn = await database
+    .query(
+      `
     SELECT
       showtime.id,
       location.location_name,
@@ -55,17 +57,20 @@ async function findMovieTimeByCinema( date, movie_id, cinema_id) {
     ${movie_id} AND ${cinema_id}
     GROUP BY movie_cinema.id, showtime.id
     ORDER BY showtime.start_time
-  `)
-  .then((answer) => {
-    return [...answer].map((item) => {
-      return {...item, seats: JSON.parse(item.seats)}
-    })
-  });
+  `
+    )
+    .then(answer => {
+      return [...answer].map(item => {
+        return { ...item, seats: JSON.parse(item.seats) };
+      });
+    });
   return rtn;
 }
 
-async function findMovieTimeByLocation ( date, movie_title, loc_name ) {
-  const rtn = await database.query(`
+async function findMovieTimeByLocation(date, movie_title, loc_name) {
+  const rtn = await database
+    .query(
+      `
     SELECT
       showtime.id,
       location.location_name,
@@ -83,33 +88,34 @@ async function findMovieTimeByLocation ( date, movie_title, loc_name ) {
     JOIN location ON cinema.location_id = location.id
     JOIN showtime ON showtime.movie_cinema_id = movie_cinema.id
     JOIN 
-        (SELECT
-          showtime_seat.showtime_id as time_id,
-          showtime.showtime_day as DAY,
-          JSON_ARRAYAGG(showtime_seat.seat_name) as SEAT
-        FROM showtime_seat
-        JOIN showtime ON showtime.id = showtime_seat.showtime_id
-        GROUP BY showtime_seat.showtime_id, showtime.showtime_day) as seat_sub ON showtime.id = seat_sub.time_id
+      (SELECT
+        showtime_seat.showtime_id as time_id,
+        showtime.showtime_day as DAY,
+        JSON_ARRAYAGG(showtime_seat.seat_name) as SEAT
+      FROM showtime_seat
+      JOIN showtime ON showtime.id = showtime_seat.showtime_id
+      GROUP BY showtime_seat.showtime_id, showtime.showtime_day) as seat_sub ON showtime.id = seat_sub.time_id
       WHERE DAY = '${date}' AND movie.ko_title = '${movie_title}' AND location.location_name = '${loc_name}'
-      GROUP BY movie_cinema.id, showtime.id
-  `)
-  .then((answer) => {
-    return [...answer].map((item) => {
-      return {...item, seats: JSON.parse(item.seats)}
-    })
-  });
+    GROUP BY movie_cinema.id, showtime.id
+  `
+    )
+    .then(answer => {
+      return [...answer].map(item => {
+        return { ...item, seats: JSON.parse(item.seats) };
+      });
+    });
   return rtn;
 }
 
 async function deleteSeat(showtime_id, seat_count, seat_name) {
-  for (let i = 0 ; i < seat_count ; i++){
+  for (let i = 0; i < seat_count; i++) {
     let seat = seat_name[i];
     await database.query(`
       DELETE
         FROM showtime_seat
       WHERE
         showtime_id = ${showtime_id} AND seat_name = '${seat}'
-    `)
+    `);
   }
 }
 
@@ -138,24 +144,41 @@ async function ExistTicketNum(TicketNum) {
       *
     FROM booking
     WHERE ticket_number = '${TicketNum}';
-  `)
+  `);
   return rtn;
 }
 
-async function insertBookingInfo(user_id, showtime_id, seat_count_adult, seat_count_child, seat_name, ko_title, movie_poster, movie_property, cinema_name, screen, showtime_day, start_time, ticket_number, price) {
-  for ( let i = 0 ; i < seat_name.length ; i++){
-    let seat = seat_name[i]
+async function insertBookingInfo(
+  user_id,
+  showtime_id,
+  seat_count_adult,
+  seat_count_child,
+  seat_name,
+  ko_title,
+  movie_poster,
+  movie_property,
+  cinema_name,
+  screen,
+  showtime_day,
+  start_time,
+  ticket_number,
+  price
+) {
+  for (let i = 0; i < seat_name.length; i++) {
+    let seat = seat_name[i];
     await database.query(`
       INSERT INTO
         booking (user_id, showtime_id, seat_count_adult, seat_count_child, seat_name, ko_title, movie_poster, movie_property, cinema_name, screen, showtime_day, start_time, ticket_number, price)
       VALUES
         (${user_id}, ${showtime_id}, ${seat_count_adult}, ${seat_count_child}, '${seat}', '${ko_title}', '${movie_poster}', '${movie_property}', '${cinema_name}', '${screen}', '${showtime_day}', '${start_time}', '${ticket_number}', ${price});
-    `)
+    `);
   }
 }
 
 async function getTimeTable(day, movie_id, loc_id) {
-  const rtn = await database.query(`
+  const rtn = await database
+    .query(
+      `
     SELECT
       showtime.id,
       location.location_name,
@@ -181,12 +204,13 @@ async function getTimeTable(day, movie_id, loc_id) {
       GROUP BY showtime_seat.showtime_id, showtime.showtime_day) as seat_sub ON showtime.id = seat_sub.time_id
     WHERE DAY = '${day}' AND movie_id = ${movie_id} AND location.id = ${loc_id}
     GROUP BY movie_cinema.id, showtime.id
-  `)
-  .then((answer) => {
-    return [...answer].map((item) => {
-      return {...item, seats: JSON.parse(item.seats)}
-    })
-  });
+  `
+    )
+    .then(answer => {
+      return [...answer].map(item => {
+        return { ...item, seats: JSON.parse(item.seats) };
+      });
+    });
   return rtn;
 }
 
@@ -201,7 +225,14 @@ async function getBookRecord(TicketNum) {
   return rtn;
 }
 
-async function createCancelRecord(user_id, ko_title, cinema_name, showtime_day, start_time, price) {
+async function createCancelRecord(
+  user_id,
+  ko_title,
+  cinema_name,
+  showtime_day,
+  start_time,
+  price
+) {
   await database.query(`
     INSERT INTO
       canceled_booking (user_id, movie_title, cinema_name, showtime_day, start_time, price)
@@ -223,7 +254,7 @@ async function getSeatByTicketNum(TicketNum) {
 }
 
 async function addSeat(showtime_id, seat) {
-  for(let i = 0 ; i < seat.length ; i++) {
+  for (let i = 0; i < seat.length; i++) {
     let seat_unit = seat[i].seat_name;
     await database.query(`
       INSERT INTO
@@ -244,7 +275,6 @@ async function deleteBookRecord(TicketNum) {
 }
 
 module.exports = {
-
   findMovieTimeByCinema,
   getallmovie,
   findCinemaByLocation,

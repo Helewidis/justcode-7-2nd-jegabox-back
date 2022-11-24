@@ -1,5 +1,6 @@
 const userDao = require('../models/userDao');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const noEngNumReg = /[^a-zA-Z0-9]/gi;
 const noEngNumSpeReg = /[^a-zA-Z0-9`₩~!@#$%^&*()_+{}:"<>?=\[/\]/;',.\|\-]/gi;
@@ -156,13 +157,14 @@ const signUp = async (
 const signIn = async (account_id, password) => {
   const userInDB = await userDao.userInDB(account_id);
   if (!userInDB) {
-    const error = new Error('NO USER DATA IN DB');
+    const error = new Error('아이디가 존재하지 않습니다.');
     error.statusCode = 404;
     throw error;
   }
+
   const pwSame = bcrypt.compareSync(password, userInDB.password);
   if (!pwSame) {
-    const error = new Error('INCORRECT PASSWORD');
+    const error = new Error('패스워드가 틀렸습니다.');
     error.statusCode = 400;
     throw error;
   }
@@ -173,7 +175,7 @@ const signIn = async (account_id, password) => {
 const checkIfIDExists = async account_id => {
   const userInDB = await userDao.userInDB(account_id);
   if (userInDB) {
-    const error = new Error(`ID '${account_id}' IS ALREADY BEING USED`);
+    const error = new Error(`이미 존재하는 아이디입니다.`);
     error.statusCode = 404;
     throw error;
   }
@@ -213,13 +215,22 @@ const findID = async (name, birthday, phone_number) => {
   //입력받은 전화번호의 불필요한 문자 제거
   phone_number = phone_number.replaceAll(/\D/g, '');
   if (!(phone_number[0] == 0 && phone_number[1] == 1)) {
-    throw new Error('PHONE NUMBER IS INVALD : SHOULD BE 01*~');
+    throw new Error('핸드폰 번호는 01로 시작해야합니다');
   }
   if (!(phone_number.length === 10 || phone_number.length === 11)) {
-    throw new Error('PHONE NUMBER IS INVALD : LENGTH');
+    throw new Error('핸드폰 번호가 유효하지 않습니다.');
   }
   //--------------전화번호검증로직끝----------------//
   const userByPhoneNumber = await userDao.IDInDB(name, birthday, phone_number);
+
+  if (
+    !userByPhoneNumber ||
+    userByPhoneNumber.name !== name ||
+    userByPhoneNumber.birthday !== birthday
+  ) {
+    throw new Error('일치하는 정보가 없습니다');
+  }
+
   return userByPhoneNumber;
 };
 
@@ -230,26 +241,19 @@ const userCheckforValidateNumber = async (account_id, name, phone_number) => {
     phone_number
   );
   if (!userInfo) {
-    throw new Error('INVALID ID, NAME, PHONE NUMBER');
+    throw new Error('일치하는 정보가 없습니다.');
   }
   return userInfo;
 };
 
-//비밀번호 재설정
+//비밀번호 재설정(로그인 화면에서 비밀번호 찾기 할 때)
 const resetPassword1 = async (account_id, password, passwordForCheck) => {
   //--------------비밀번호검증로직시작----------------//
   //비밀번호가 일치하지 않을 경우 오류 발생
   if (password !== passwordForCheck) {
-    throw new Error('PASSWORDS DO NOT MATCH');
+    throw new Error('비밀번호가 일치하지 않습니다');
   }
-  //비밀번호가 6~20자리가 아닐 시 오류 발생
-  if (password.length < 6 || password.length > 20) {
-    throw new Error('PASSWORD MUST BE 6~20 DIGITS');
-  }
-  //비밀번호에 스페이스가 있을 시 오류 발생
-  if (password.search(/\s/) > -1) {
-    throw new Error('SPACE IS NOT ALLOWED FOR PASSWORD');
-  }
+
   //비밀번호를 구성하는 변수 종류를 variablesCount으로 측정
   let variablesCount = 0;
   if (password.search(engReg) !== -1) {
@@ -261,18 +265,19 @@ const resetPassword1 = async (account_id, password, passwordForCheck) => {
   if (password.search(speReg) !== -1) {
     variablesCount += 1;
   }
-  //비밀번호를 구성하는 변수의 종류가 2종 이하일 경우 오류 발생
-  if (variablesCount < 2) {
+
+  if (
+    password.length < 6 ||
+    password.length > 20 ||
+    password.search(/\s/) > -1 ||
+    variablesCount < 2 ||
+    password.search(noEngNumSpeReg) !== -1
+  ) {
     throw new Error(
-      'PASSWORD MUST HAVE AT LEAST TWO ELEMENTS BETWEEN ENGLISH & SPECIAL CHARACTERS, NUMBERS'
+      '비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합 6자리 이상 20자리 이하로 설정해주세요'
     );
   }
-  //비밀번호에 영어, 특수문자, 숫자 이외의 문제가 입력될 시 오류 발생
-  if (password.search(noEngNumSpeReg) !== -1) {
-    throw new Error(
-      'PASSWORD ONLY INCLUDES ENGLISH & SPECIAL CHARACTERS, NUMBERS'
-    );
-  }
+
   //--------------비밀번호검증로직끝----------------//
   const salt = bcrypt.genSaltSync();
   const hashed_password = bcrypt.hashSync(password, salt);
@@ -280,67 +285,12 @@ const resetPassword1 = async (account_id, password, passwordForCheck) => {
 };
 
 //비밀번호 재설정
-const resetPassword2 = async (account_id, password, passwordForCheck) => {
-  const pwSame = bcrypt.compareSync(password, userInDB.password);
-  if (!pwSame) {
-    const error = new Error('INCORRECT PASSWORD');
-    error.statusCode = 400;
-    throw error;
-  }
-  //--------------비밀번호검증로직시작----------------//
-  //비밀번호가 일치하지 않을 경우 오류 발생
-  if (password !== passwordForCheck) {
-    throw new Error('PASSWORDS DO NOT MATCH');
-  }
-  //비밀번호가 6~20자리가 아닐 시 오류 발생
-  if (password.length < 6 || password.length > 20) {
-    throw new Error('PASSWORD MUST BE 6~20 DIGITS');
-  }
-  //비밀번호에 스페이스가 있을 시 오류 발생
-  if (password.search(/\s/) > -1) {
-    throw new Error('SPACE IS NOT ALLOWED FOR PASSWORD');
-  }
-  //비밀번호를 구성하는 변수 종류를 variablesCount으로 측정
-  let variablesCount = 0;
-  if (password.search(engReg) !== -1) {
-    variablesCount += 1;
-  }
-  if (password.search(numReg) !== -1) {
-    variablesCount += 1;
-  }
-  if (password.search(speReg) !== -1) {
-    variablesCount += 1;
-  }
-  //비밀번호를 구성하는 변수의 종류가 2종 이하일 경우 오류 발생
-  if (variablesCount < 2) {
-    throw new Error(
-      'PASSWORD MUST HAVE AT LEAST TWO ELEMENTS BETWEEN ENGLISH & SPECIAL CHARACTERS, NUMBERS'
-    );
-  }
-  //비밀번호에 영어, 특수문자, 숫자 이외의 문제가 입력될 시 오류 발생
-  if (password.search(noEngNumSpeReg) !== -1) {
-    throw new Error(
-      'PASSWORD ONLY INCLUDES ENGLISH & SPECIAL CHARACTERS, NUMBERS'
-    );
-  }
-  //--------------비밀번호검증로직끝----------------//
-  const salt = bcrypt.genSaltSync();
-  const hashed_password = bcrypt.hashSync(password, salt);
-  await userDao.resetPassword(account_id, hashed_password);
-  return userInDB;
-};
-
-const requestMypage = async account_id => {
-  const userInDB = await userDao.userInDB(account_id);
-  return userInDB;
-};
-
-const modifyMypage = async (account_id, email) => {
-  const userInDB = await userDao.modifyMypage(account_id, email);
-  return userInDB;
-};
-
-const deleteAccount = async (account_id, password) => {
+const resetPassword2 = async (
+  account_id,
+  password,
+  password_new,
+  passwordForCheck_new
+) => {
   const userInDB = await userDao.userInDB(account_id);
   if (!userInDB) {
     const error = new Error('NO USER DATA IN DB');
@@ -353,7 +303,93 @@ const deleteAccount = async (account_id, password) => {
     error.statusCode = 400;
     throw error;
   }
+  //--------------비밀번호검증로직시작----------------//
+  //비밀번호가 일치하지 않을 경우 오류 발생
+  if (password_new !== passwordForCheck_new) {
+    throw new Error('비밀번호가 일치하지 않습니다');
+  }
+  //비밀번호를 구성하는 변수 종류를 variablesCount으로 측정
+  let variablesCount = 0;
+  if (password_new.search(engReg) !== -1) {
+    variablesCount += 1;
+  }
+  if (password_new.search(numReg) !== -1) {
+    variablesCount += 1;
+  }
+  if (password_new.search(speReg) !== -1) {
+    variablesCount += 1;
+  }
+  //비밀번호를 구성하는 변수의 종류가 2종 이하일 경우 오류 발생
+  if (
+    password_new.length < 6 ||
+    password_new.length > 20 ||
+    password_new.search(/\s/) > -1 ||
+    variablesCount < 2 ||
+    password_new.search(noEngNumSpeReg) !== -1
+  ) {
+    throw new Error(
+      '비밀번호는 영문, 숫자, 특수문자 중 2가지 이상 조합 6자리 이상 20자리 이하로 설정해주세요'
+    );
+  }
+
+  //--------------비밀번호검증로직끝----------------//
+  const salt = bcrypt.genSaltSync();
+  const hashed_password = bcrypt.hashSync(password_new, salt);
+  await userDao.resetPassword(account_id, hashed_password);
+};
+
+const requestMypage = async account_id => {
+  const userInDB = await userDao.userInDB(account_id);
+  return userInDB;
+};
+
+const modifyMypage = async (account_id, email) => {
+  //--------------이메일검증----------------//
+  if (email.search(emailReg) === -1) {
+    throw new Error('EMAIL IS INVALID');
+  }
+  const userInDB = await userDao.modifyMypage(account_id, email);
+  return userInDB;
+};
+
+const deleteAccount = async (account_id, password) => {
+  const userInDB = await userDao.userInDB(account_id);
+  if (!userInDB) {
+    const error = new Error('아이디가 존재하지 않습니다.');
+    error.statusCode = 404;
+    throw error;
+  }
+  const pwSame = bcrypt.compareSync(password, userInDB.password);
+  if (!pwSame) {
+    const error = new Error('비밀번호가 일치하지 않습니다');
+    error.statusCode = 400;
+    throw error;
+  }
   await userDao.deleteAccount(account_id);
+};
+
+//마이페이지에서 전화번호 변경 API
+const checkIfPhoneNumberExists = async (account_id, phone_number) => {
+  const userByPhoneNumber = await userDao.checkIfPhoneNumberExists2(account_id);
+  if (userByPhoneNumber.phone_number == phone_number) {
+    const error = new Error(`NEW PHONE NUMBER REQUIRED`);
+    error.statusCode = 404;
+    throw error;
+  }
+  const checkIfPhoneNumberIsOccupied = await userDao.checkIfPhoneNumberExists(
+    phone_number
+  );
+  if (checkIfPhoneNumberIsOccupied) {
+    const error = new Error(
+      `PHONE NUMBER '${phone_number}' IS ALREADY BEING USED`
+    );
+    error.statusCode = 404;
+    throw error;
+  }
+};
+
+const modifyPhoneNumber = async (account_id, phone_number) => {
+  await userDao.modifyPhoneNumber(account_id, phone_number);
 };
 
 module.exports = {
@@ -367,4 +403,6 @@ module.exports = {
   requestMypage,
   modifyMypage,
   deleteAccount,
+  checkIfPhoneNumberExists,
+  modifyPhoneNumber,
 };
