@@ -51,8 +51,12 @@ const getAllMovies = async (likecnt, release) => {
   return getMainMovies;
 };
 
+<<<<<<< HEAD
 const getAllMovies = async release => {
 >>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
+=======
+const getAllMovies = async (likecnt, release) => {
+>>>>>>> dec5ea4 (FEAT: add likecnt query)
   const getAllMovies = await database
     .query(
       `
@@ -83,9 +87,14 @@ const getAllMovies = async release => {
     movie.like,
     lt.cnt,
     mtt.type,
-    avgt.rated
+    avgt.rated,
+    lct.likeCnt
   FROM movie
+<<<<<<< HEAD
 >>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
+=======
+  ${likecnt}
+>>>>>>> dec5ea4 (FEAT: add likecnt query)
   LEFT JOIN (SELECT movie_id, ROUND(avg(rating),1) AS rated FROM comment GROUP BY movie_id ) AS avgt ON movie.id = avgt.movie_id
   LEFT JOIN (SELECT movie_id, count(*) AS cnt FROM jegabox.like GROUP BY movie_id) AS lt ON movie.id = lt.movie_id
   LEFT JOIN (SELECT movie_type.movie_id, JSON_ARRAYAGG(movie_type_properties.movie_type) AS type FROM movie_type LEFT JOIN movie_type_properties ON movie_type.movie_type_properties_id = movie_type_properties.id GROUP BY movie_type.movie_id) AS mtt ON movie.id = mtt.movie_id
@@ -117,6 +126,7 @@ const getAllMovies = async release => {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const getComingsoonMovies = async (likecnt, sorted_by) => {
   const comingsoonMovie = await database
     .query(
@@ -126,12 +136,19 @@ const getComingsoonMovies = async (likecnt, sorted_by) => {
   ${likecnt}
 =======
 const getComingsoonMovies = async sorted_by => {
+=======
+const getComingsoonMovies = async (likecnt, sorted_by) => {
+>>>>>>> dec5ea4 (FEAT: add likecnt query)
   const comingsoonMovie = await database
     .query(
       `
-  SELECT movie.id, movie.ko_title, movie.movie_poster, movie.description, movie.grade, movie.like, movie.viewer as viewer, movie.release_date, lt.cnt as cnt, mtt.type, avgt.rated
+  SELECT movie.id, movie.ko_title, movie.movie_poster, movie.description, movie.grade, movie.like, movie.viewer as viewer, movie.release_date, lt.cnt as cnt, mtt.type, avgt.rated, lct.likeCnt
   FROM movie
+<<<<<<< HEAD
 >>>>>>> f9ff8ef (FEAT: ADD COMMENT API)
+=======
+  ${likecnt}
+>>>>>>> dec5ea4 (FEAT: add likecnt query)
   LEFT JOIN (SELECT movie_id, ROUND(avg(rating),1) AS rated FROM comment GROUP BY movie_id ) AS avgt ON movie.id = avgt.movie_id
   LEFT JOIN (SELECT movie_id, count(*) AS cnt FROM jegabox.like GROUP BY movie_id) AS lt ON movie.id = lt.movie_id
   LEFT JOIN (SELECT movie_type.movie_id, JSON_ARRAYAGG(movie_type_properties.movie_type) AS type FROM movie_type LEFT JOIN movie_type_properties ON movie_type.movie_type_properties_id = movie_type_properties.id GROUP BY movie_type.movie_id) AS mtt ON movie.id = mtt.movie_id
@@ -162,6 +179,7 @@ const getComingsoonMovies = async sorted_by => {
   return comingsoonMovie;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 const searchText = async (likecnt, searchText) => {
   const result = await database
@@ -221,15 +239,40 @@ const searchTitle = async (likecnt, searchTitle) => {
       );
 =======
 const searchText = async searchText => {
+=======
+const searchText = async (likecnt, searchText) => {
+>>>>>>> dec5ea4 (FEAT: add likecnt query)
   const result = await database
     .query(
       `
-    SELECT movie.id, movie.ko_title, movie.movie_poster, movie.description, movie.grade, movie.viewer, lt.cnt, mtt.type, avgt.rated
-    FROM movie 
-    LEFT JOIN (SELECT movie_id, ROUND(avg(rating),1) AS rated FROM comment GROUP BY movie_id ) AS avgt ON movie.id = avgt.movie_id
-    LEFT JOIN (SELECT movie_id, count(*) AS cnt FROM jegabox.like GROUP BY movie_id) AS lt ON movie.id = lt.movie_id 
-    LEFT JOIN (SELECT movie_type.movie_id, JSON_ARRAYAGG(movie_type_properties.movie_type) AS type FROM movie_type LEFT JOIN movie_type_properties ON movie_type.movie_type_properties_id = movie_type_properties.id GROUP BY movie_type.movie_id) AS mtt ON movie.id = mtt.movie_id 
-    WHERE  movie.ko_title like '%${searchText}%'
+      SELECT movie.id, movie.ko_title, movie.movie_poster, movie.description, movie.grade, movie.like, movie.viewer as viewer, movie.release_date, lt.cnt as cnt, mtt.type, avgt.rated, lct.likeCnt
+      FROM movie
+      ${likecnt}
+      LEFT JOIN (SELECT movie_id, ROUND(avg(rating),1) AS rated FROM comment GROUP BY movie_id ) AS avgt ON movie.id = avgt.movie_id
+      LEFT JOIN (SELECT movie_id, count(*) AS cnt FROM jegabox.like GROUP BY movie_id) AS lt ON movie.id = lt.movie_id
+      LEFT JOIN (SELECT movie_type.movie_id, JSON_ARRAYAGG(movie_type_properties.movie_type) AS type FROM movie_type LEFT JOIN movie_type_properties ON movie_type.movie_type_properties_id = movie_type_properties.id GROUP BY movie_type.movie_id) AS mtt ON movie.id = mtt.movie_id
+      WHERE  movie.ko_title like '%${searchText}%'
+    `
+    )
+    .then(answer => {
+      return [...answer].map(unit => {
+        return { ...unit, type: JSON.parse(unit.type) };
+      });
+    });
+  return result;
+};
+
+const searchTitle = async (likecnt, searchTitle) => {
+  const result = await database
+    .query(
+      `
+      SELECT movie.id, movie.ko_title, movie.movie_poster, movie.description, movie.grade, movie.like, movie.viewer as viewer, movie.release_date, lt.cnt as cnt, mtt.type, avgt.rated, lct.likeCnt
+      FROM movie
+      ${likecnt}
+      LEFT JOIN (SELECT movie_id, ROUND(avg(rating),1) AS rated FROM comment GROUP BY movie_id ) AS avgt ON movie.id = avgt.movie_id
+      LEFT JOIN (SELECT movie_id, count(*) AS cnt FROM jegabox.like GROUP BY movie_id) AS lt ON movie.id = lt.movie_id
+      LEFT JOIN (SELECT movie_type.movie_id, JSON_ARRAYAGG(movie_type_properties.movie_type) AS type FROM movie_type LEFT JOIN movie_type_properties ON movie_type.movie_type_properties_id = movie_type_properties.id GROUP BY movie_type.movie_id) AS mtt ON movie.id = mtt.movie_id
+      WHERE  movie.ko_title like '%${searchTitle}%'
     `
     )
     .then(answer => {
