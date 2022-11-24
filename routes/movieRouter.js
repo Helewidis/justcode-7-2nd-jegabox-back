@@ -5,7 +5,7 @@ const controller = require('../controllers/movieController');
 
 router.get('/main', controller.getMainMovies);
 router.post('/list', controller.getAllMovies);
-router.get('/comingsoon', controller.getComingsoonMovies);
+router.post('/comingsoon', controller.getComingsoonMovies);
 router.post('/', controller.searchTitle);
 router.get('/', controller.searchText);
 
