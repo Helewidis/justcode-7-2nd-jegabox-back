@@ -48,7 +48,7 @@ const getMainMovies = async likecnt => {
         FROM movie_type
         LEFT JOIN movie_type_properties ON movie_type.movie_type_properties_id = movie_type_properties.id
         GROUP BY movie_type.movie_id) AS mtt ON movie.id = mtt.movie_id 
-      ORDER BY id
+      ORDER BY movie.viewer DESC
       LIMIT 5
     `
     )
@@ -108,7 +108,7 @@ const getAllMovies = async (likecnt, release) => {
         movie_type_properties ON movie_type.movie_type_properties_id = movie_type_properties.id
       GROUP BY movie_type.movie_id) AS mtt ON movie.id = mtt.movie_id
     ${release}
-    `
+    ORDER BY movie.viewer DESC`
     )
     .then(answer => {
       return [...answer].map(unit => {

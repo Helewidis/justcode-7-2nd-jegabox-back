@@ -28,7 +28,7 @@ router.post(
 router.post('/validateNumber2', asyncWrap(userController.sendValidateNumber));
 
 //본인인증을 위한 인증번호 발송API(회원정보 수정 시)
-router.post('/validateNumber3', userController.sendValidateNumber2);
+router.post('/validateNumber3', asyncWrap(userController.sendValidateNumber2));
 
 //인증번호 확인API(비밀번호 찾기)
 router.patch('/validateNumber', asyncWrap(userController.checkValidateNumber));
@@ -46,6 +46,9 @@ router.post('/mypage', asyncWrap(userController.requestMypage));
 router.patch('/mypage', asyncWrap(userController.modifyMypage));
 
 //인증번호 확인API(마이페이지 전화번호 수정)
-router.patch('/validateNumber2', userController.checkValidateNumber2);
+router.patch(
+  '/validateNumber2',
+  asyncWrap(userController.checkValidateNumber2)
+);
 
 module.exports = router;

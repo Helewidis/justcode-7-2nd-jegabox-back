@@ -5,10 +5,10 @@ const controller = require('../controllers/movieController');
 const { asyncWrap } = require('../utils/myutils');
 
 router.get('/main', controller.getMainMovies);
-router.get('/list', controller.getAllMovies);
-router.get('/comingsoon', controller.getComingsoonMovies);
+router.post('/list', controller.getAllMovies);
+router.post('/comingsoon', controller.getComingsoonMovies);
 router.post('/', controller.searchTitle);
 router.get('/', controller.searchText);
-router.get('/', asyncWrap(controller.getMovieByTitle));
+router.get('/:id', asyncWrap(controller.getMovieByTitle));
 
 module.exports = router;
